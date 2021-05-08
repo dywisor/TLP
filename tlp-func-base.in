@@ -123,6 +123,7 @@ wordinlist () { # test if word in list
 
 # --- Sysfiles
 
+# NOTE: "check_sth()" usually implies a yes/no return code or exit-on-missing action
 check_sysfs () { # debug: check if sysfile exists -- $1: routine; $2: sysfs path
     if wordinlist "sysfs" "$TLP_DEBUG"; then
         if [ ! -e $2 ]; then
