@@ -143,12 +143,19 @@ read_sysf () { # read and echo contents of sysfile
     fi
     # NOTE: for single-line files, using the read builtin would be more appropriate
     ##
+    ###
     ## non-local outvar  (could be a local var in caller's function scope)
+    ## !!! needs refactoring
+    ### OR
+    ## local outvar -- print before return
+    ###
     ##
     ## if ! { read -r outvar < "$1"; } 1>/dev/null 2>&1; then
     ##     outvar="$2"
+    ##     ## OR-local:  printf '%s' "$outvar"
     ##     return 1
     ## else
+    ##     ## OR-local:  printf '%s' "$outvar"
     ##     return 0
     ## fi
 }
@@ -159,7 +166,7 @@ readable_sysf () { # check if file is actually readable -- $1: file
     # NOTE: for single-line files, using the read builtin would be more appropriate
     ## local outvar
     ## read_sysf "$@"
-    ### OR
+    ### OR-local
     ## local dummy
     ## { read -r dummy < "$1"; } 1>/dev/null 2>&1
 }
@@ -182,6 +189,18 @@ write_sysf () { # write string to a sysfile
 
 # --- Globbing
 
+
+# NOTE:
+#  for x in $(glob_files 'a*' dirpath ); do ...; done
+# globs twice:
+#
+#   (a) once in the "for file_iter" loop in glob_files()
+#   (b) another time when x gets word expanded in the "for x" loop
+#
+# crafted filenames will break this function (e.g. a file named '*'),
+# as such it should be only be used with 'sort-of trustworthy' directories
+# (sysfs, proc).
+#
 glob_files () {
     # @stdout glob_files ( glob_pattern, dir[, dir...] )
     #
@@ -200,6 +219,7 @@ glob_files () {
     done
 }
 
+# NOTE: globs twice
 glob_dirs () {
     # @stdout glob_dirs ( glob_pattern, dir[, dir...] )
     #
