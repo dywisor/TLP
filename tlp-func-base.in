@@ -141,17 +141,37 @@ read_sysf () { # read and echo contents of sysfile
     else
         return 0
     fi
+    # NOTE: for single-line files, using the read builtin would be more appropriate
+    ##
+    ## non-local outvar  (could be a local var in caller's function scope)
+    ##
+    ## if ! { read -r outvar < "$1"; } 1>/dev/null 2>&1; then
+    ##     outvar="$2"
+    ##     return 1
+    ## else
+    ##     return 0
+    ## fi
 }
 
 readable_sysf () { # check if file is actually readable -- $1: file
     # rc: 0=readable/1=read error
     cat "$1" > /dev/null 2>&1
+    # NOTE: for single-line files, using the read builtin would be more appropriate
+    ## local outvar
+    ## read_sysf "$@"
+    ### OR
+    ## local dummy
+    ## { read -r dummy < "$1"; } 1>/dev/null 2>&1
 }
 
 read_sysval () { # read and echo contents of sysfile
     # echo '0' if file is non-existent, read fails or is non-numeric
     # $1: sysfile; rc: 0=ok/1=error
     printf "%d" "$(read_sysf $1)" 2> /dev/null
+    # NOTE: follow-up on single-line files cat <> read
+    ## read_sysf "$@" || return 1
+    ## # only non-numbers evaluate to false for both eq and ne checks
+    ## { test "$outvar" -eq 0 || test "$outvar" -ne 0; } || outvar=?FALLBACK?
 }
 
 write_sysf () { # write string to a sysfile
